@@ -14,8 +14,13 @@ export default class Temperature extends Component {
         this.state = { 
           temperature: '',
           timestamp: '',
+          formattedDate: '',
           message: ''
         }
+    }
+
+    componentDidMount() {
+        this.getLastTemperature()        
     }
 
     static navigationOptions = {
@@ -23,47 +28,53 @@ export default class Temperature extends Component {
     }
 
     getLastTemperature() {
-        // this.props.navigation.navigate('DrawerOpen');
-        
+        this.setData('-', 'loading...')
+
         axios.get(`${API_URL}measurements/last/1`).then(res => {
           
-          this.setState({...this.state,
-            temperature: res.data.data ? res.data.data.temperature : '',
-            timestamp: res.data.data ? res.data.data.timestamp : '',
-            message: res.data.message
-          })
-          console.log('getLastTemperature', res.data)
+            this.setData(
+                res.data.data ? res.data.data.temperature : null,
+                res.data.data ? res.data.data.timestamp : null,
+                res.data.message
+            )
+            console.log('getLastTemperature', res.data)
         })
     }
 
-    goToChart() {
-        this.props.navigation.navigate('Chart')
+    setData(temperature = '', timestamp = '', message = '') {
+        this.setState({...this.state,
+            temperature: isNaN(parseFloat(temperature)) ? temperature : `${temperature}${String.fromCharCode(176)}`,
+            timestamp: timestamp,
+            formattedDate: new Date(timestamp) instanceof Date ? `on ${new Date(timestamp).toLocaleString()}` : timestamp,
+            message: message
+          })
     }
 
     render() {
         const { navigate } = this.props.navigation;
         return (
             <View style={styles.container}>
-            <StatusBar barStyle="dark-content" hidden={true}/>
-          
-            <Text style={styles.title}>Temperature Monitor App</Text>
-            <Text>Temperature: {this.state.temperature}</Text>
-            <Text>Timestamp: {this.state.timestamp}</Text>
-            <Text>Message: {this.state.message}</Text>
-            <Button
-              style={styles.buttonAction}
-              onPress={this.getLastTemperature}
-              title="atualizar"
-              color="#841584"
-              accessibilityLabel="refresh temperature monitor data"
-            />
-            <Button
-              style={styles.buttonAction}
-              onPress={() => navigate('Chart')}
-              title="graficos"
-              color="#841584"
-              accessibilityLabel="refresh temperature monitor data"
-            />
+                <StatusBar barStyle="dark-content" hidden={true}/>
+            
+                <View style={styles.containerTitle} >
+                    <Text style={styles.bigText}
+                        onPress={this.getLastTemperature}>
+                        {this.state.temperature ? this.state.temperature : '-'}
+                    </Text>
+                </View>
+
+                <View style={{
+                        flex: 1,
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                    }}>
+                    <View style={styles.subtitleBlock}>
+                        <Text style={styles.subtitleText}>{this.state.formattedDate}</Text>
+                    </View>
+                    <View style={styles.subtitleBlock} >
+                        <Text>Message: {this.state.message}</Text>
+                    </View>
+                </View>
           </View>            
         )
     }
@@ -71,15 +82,26 @@ export default class Temperature extends Component {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }, 
+    containerTitle: {
+        flex: 3,        
+        alignItems: 'center',
+        justifyContent: 'center',       
+        // backgroundColor: 'powderblue',
     },
-    title: {
-      fontWeight: 'bold',
+    subtitleBlock: {
+        height: 50
     },
-    buttonAction: {
-      marginTop: '60px',
+    bigText: {
+        fontSize: 70,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    }, 
+    subtitleText: {
+        textAlign: 'center',        
     }
   })

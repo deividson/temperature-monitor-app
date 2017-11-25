@@ -24,7 +24,7 @@ export default class ChartTemperaturePeriods extends Component {
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" hidden={true}/>
             <Text>chart page</Text>
-          </View>            
+        </View>            
         )
     }
 }
@@ -35,11 +35,5 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    title: {
-      fontWeight: 'bold',
-    },
-    buttonAction: {
-      marginTop: '32px',
     }
   })
