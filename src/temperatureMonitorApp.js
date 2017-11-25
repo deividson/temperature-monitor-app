@@ -6,8 +6,8 @@ import ChartTemperaturePeriods from './chartTemperaturePeriods'
 import Settings from './settings'
 
 const AppNavigator = DrawerNavigator({
-  Home: { screen: Temperature },
   Chart: { screen: ChartTemperaturePeriods },
+  Home: { screen: Temperature },  
   Settings: { screen: Settings },
 })
 
