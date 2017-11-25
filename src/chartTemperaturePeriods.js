@@ -9,6 +9,7 @@ export default class ChartTemperaturePeriods extends Component {
     constructor(props) {
         super(props)
     
+        this.getPeriod = this.getPeriod.bind(this)
 
         this.state = { 
           temperatureList: [],
@@ -19,11 +20,27 @@ export default class ChartTemperaturePeriods extends Component {
         drawerLabel: 'Periods Chart'
     }
 
+    componentDidMount() {
+        this.getPeriod()
+    }
+
+    getPeriod() {
+        // ler input ou pegar default (1d)
+        this.periodSelected = {
+            fromEpoch: (new Date()).setDate(new Date().getDate()-1),
+            toEpoch: new Date().valueOf()
+        }
+
+        axios.get(`${API_URL}/measurements/period/1?from=${this.periodSelected.fromEpoch}&to=${this.periodSelected.toEpoch}`).then(res => {
+            console.log('getPeriod', res.data)
+        })
+    }
+
     render() {
         return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" hidden={true}/>
-            <Text>chart page</Text>
+            <Text onPress={this.getPeriod}>chart page</Text>
         </View>            
         )
     }

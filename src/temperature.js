@@ -30,7 +30,7 @@ export default class Temperature extends Component {
     getLastTemperature() {
         this.setData('-', 'loading...')
 
-        axios.get(`${API_URL}measurements/last/1`).then(res => {
+        axios.get(`${API_URL}/measurements/last/1`).then(res => {
           
             this.setData(
                 res.data.data ? res.data.data.temperature : null,
