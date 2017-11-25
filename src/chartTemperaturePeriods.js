@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { StatusBar } from 'react-native'
-import { VictoryAxis, VictoryTheme, VictoryLine, VictoryStack, VictoryChart, VictoryBar } from "victory-native";
+import { VictoryScatter, VictoryTheme, VictoryLine, VictoryStack, VictoryChart, VictoryBar } from "victory-native";
 
 import axios from 'axios'
 import { API_URL } from 'react-native-dotenv'
@@ -43,10 +43,9 @@ export default class ChartTemperaturePeriods extends Component {
             <View style={styles.container}>
  
                 <VictoryChart theme={VictoryTheme.material}>
-                    <VictoryLine style={{
-                        data: { stroke: "#c43a31" },
-                        parent: { border: "1px solid #ccc"}
-                        }}
+                    <VictoryScatter
+                        style={{ data: { fill: "#c43a31" } }}
+                        size={2}
                         data={this.state.temperatureList}/>
 
                 </VictoryChart>
