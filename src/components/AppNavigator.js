@@ -1,11 +1,12 @@
 import React from 'react'
 import { DrawerNavigator } from 'react-navigation'
-import Temperature from './LastTemperature'
-import ChartTemperaturePeriods from './PeriodTemperature'
+
+import LastTemperature from './screens/LastTemperature'
+import PeriodTemperature from './screens/PeriodTemperature'
 
 const AppNavigator = DrawerNavigator({
-  Chart: { screen: ChartTemperaturePeriods },
-  Home: { screen: Temperature },
+  LastTemperature: { screen: LastTemperature },
+  PeriodTemperature: { screen: PeriodTemperature },
 })
 
 export default () => <AppNavigator />
