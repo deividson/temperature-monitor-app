@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+
 import {
   StyleSheet,
   Text,
@@ -17,9 +18,48 @@ const STATUS = {
   ERROR: 'ERROR',
 }
 
-export default class Temperature extends Component {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  containerInput: {
+    flex: 1,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+  },
+  containerTitle: {
+    flex: 2,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // backgroundColor: 'powderblue',
+  },
+  subtitleBlock: {
+    height: 50,
+  },
+  bigText: {
+    fontSize: 70,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitleText: {
+    textAlign: 'center',
+  },
+})
+
+export default class LastTemperature extends Component {
   static navigationOptions = {
-    drawerLabel: 'Temperature Monitor'
+    drawerLabel: 'Last Temperature',
+  }
+
+  static renderPlaceholder() {
+    return (
+      <View style={styles.containerInput}>
+        <Text>Fill the sensor ID to get the last temperature</Text>
+      </View>
+    )
   }
 
   state = {
@@ -32,7 +72,7 @@ export default class Temperature extends Component {
     const { sensorId } = this.state
 
     axios.get(`${API_URL}/measurements/last/${sensorId}`)
-      .then(res => {
+      .then((res) => {
         const { data } = res.data
         if (!data) {
           throw new Error(`No data for sensor ${sensorId}`)
@@ -41,7 +81,7 @@ export default class Temperature extends Component {
       })
       .then(data => this.setState({ status: STATUS.SUCCESS, data }))
       .catch((err) => {
-        console.log('Error while getting data', err)
+        console.log('Error while getting data', err) // eslint-disable-line no-console
         this.setState({ status: STATUS.ERROR })
       })
   }
@@ -74,18 +114,10 @@ export default class Temperature extends Component {
     )
   }
 
-  renderPlaceholder() {
-    return (
-      <View style={styles.containerInput}>
-        <Text>Fill the sensor ID to get the last temperature</Text>
-      </View>
-    )
-  }
-
   renderError() {
     return (
       <View style={styles.containerInput}>
-        <Text>Couldn't get data for sensor {this.state.sensorId}</Text>
+        <Text>{`Couldn't get data for sensor ${this.state.sensorId}`}</Text>
       </View>
     )
   }
@@ -95,7 +127,7 @@ export default class Temperature extends Component {
 
     let content
     if (status === STATUS.EMPTY) {
-      content = this.renderPlaceholder()
+      content = LastTemperature.renderPlaceholder()
     } else if (status === STATUS.SUCCESS) {
       content = this.renderResult()
     } else if (status === STATUS.ERROR) {
@@ -104,16 +136,21 @@ export default class Temperature extends Component {
 
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" hidden={true}/>
+        <StatusBar barStyle="dark-content" hidden />
         <View style={styles.containerInput}>
           <TextInput
-            placeholder={'Enter the sensor id'}
-            style={{width: 200, height: 40, borderColor: 'gray', borderWidth: 1}}
+            placeholder="Enter the sensor id"
+            style={{
+              width: 200,
+              height: 40,
+              borderColor: 'gray',
+              borderWidth: 1,
+            }}
             onChangeText={this.handleChangeText}
             value={this.state.sensorId}
           />
           <Button
-            style={{width: 200}}
+            style={{ width: 200 }}
             onPress={this.handlePressButton}
             title="Get last temperature"
           />
@@ -123,34 +160,3 @@ export default class Temperature extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  containerInput: {
-    flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
-  },
-  containerTitle: {
-    flex: 2,
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // backgroundColor: 'powderblue',
-  },
-  subtitleBlock: {
-    height: 50
-  },
-  bigText: {
-    fontSize: 70,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  subtitleText: {
-    textAlign: 'center',
-  }
-})

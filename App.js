@@ -1,10 +1,4 @@
 import React from 'react'
-import TemperatureMonitorApp from './src/temperatureMonitorApp'
+import AppNavigator from './src/components/AppNavigator'
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <TemperatureMonitorApp/>
-    )
-  }
-}
+export default () => <AppNavigator />
