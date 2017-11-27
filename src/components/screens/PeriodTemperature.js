@@ -2,16 +2,19 @@ import React, { Component } from 'react'
 
 import {
   View,
-  StatusBar,
 } from 'react-native'
 
 import {
+  VictoryAxis,
   VictoryScatter,
   VictoryTheme,
   VictoryLine,
   VictoryChart,
 } from 'victory-native'
 
+import moment from 'moment'
+
+import Loader from '../common/Loader'
 import MeasurementFilter from '../common/MeasurementFilter'
 import ScreenTitle from '../common/ScreenTitle'
 import SensorResultError from '../common/SensorResultError'
@@ -34,15 +37,13 @@ export default class PeriodTemperature extends Component {
 
   getData = () => {
     const { sensorId } = this.state
+    const fromEpoch = (new Date()).setHours(new Date().getHours() - 1)
+    const toEpoch = new Date().valueOf()
 
-    this.periodSelected = {
-      // fromEpoch: (new Date()).setDate(new Date().getDate()-1),
-      fromEpoch: (new Date()).setHours(new Date().getHours() - 1),
-      toEpoch: new Date().valueOf(),
-    }
+    this.setState({ status: COMPONENT_STATUS.LOADING })
 
     return measurementsApi
-      .period('1', this.periodSelected.fromEpoch, this.periodSelected.toEpoch)
+      .period(sensorId, fromEpoch, toEpoch)
       .then((data) => {
         if (!data) {
           throw new Error(`No data for sensor ${sensorId}`)
@@ -69,26 +70,36 @@ export default class PeriodTemperature extends Component {
 
   renderPlaceholder = () => (<SensorResultPlaceholder />)
   renderError = () => (<SensorResultError sensorId={this.state.sensorId} />)
+  renderLoader = () => (<Loader />)
 
   renderResult() {
     const { data } = this.state
-    const temperatureList = data.map(t => ({ x: t.timestamp, y: t.temperature }))
+    const temperatureList = data.map(t => ({
+      x: moment(t.timestamp).format('DD/MM - hh:mm'),
+      y: t.temperature,
+    }))
 
     return (
-      <VictoryChart
-        theme={VictoryTheme.grayscale}
-        domain={{ y: [0, 40] }}
-      >
-        <VictoryLine
-          style={{ data: { stroke: 'rgba(75, 192, 192, 1)' } }}
-          data={temperatureList}
-        />
-        <VictoryScatter
-          style={{ data: { fill: 'rgba(75, 192, 192, 1)' } }}
-          data={temperatureList}
-          size={2}
-        />
-      </VictoryChart>
+      <View>
+        <VictoryChart
+          theme={VictoryTheme.grayscale}
+          domain={{ y: [0, 40] }}
+        >
+          <VictoryLine
+            style={{ data: { stroke: 'rgba(75, 192, 192, 1)' } }}
+            data={temperatureList}
+          />
+          <VictoryScatter
+            style={{ data: { fill: 'rgba(75, 192, 192, 1)' } }}
+            data={temperatureList}
+            size={2}
+          />
+          <VictoryAxis
+            tickCount={2}
+          />
+          <VictoryAxis dependentAxis />
+        </VictoryChart>
+      </View>
     )
   }
 
@@ -98,6 +109,8 @@ export default class PeriodTemperature extends Component {
     let content
     if (status === COMPONENT_STATUS.EMPTY) {
       content = this.renderPlaceholder()
+    } else if (status === COMPONENT_STATUS.LOADING) {
+      content = this.renderLoader()
     } else if (status === COMPONENT_STATUS.SUCCESS) {
       content = this.renderResult()
     } else if (status === COMPONENT_STATUS.ERROR) {
@@ -106,7 +119,6 @@ export default class PeriodTemperature extends Component {
 
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" hidden />
         <ScreenTitle text={PeriodTemperature.navigationOptions.drawerLabel} />
         <MeasurementFilter
           value={this.state.sensorId}

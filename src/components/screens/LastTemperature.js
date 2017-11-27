@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import {
   Text,
   View,
-  StatusBar,
 } from 'react-native'
 
+import Loader from '../common/Loader'
 import MeasurementFilter from '../common/MeasurementFilter'
 import ScreenTitle from '../common/ScreenTitle'
 import SensorResultError from '../common/SensorResultError'
@@ -28,6 +28,8 @@ export default class LastTemperature extends Component {
 
   getData = () => {
     const { sensorId } = this.state
+
+    this.setState({ status: COMPONENT_STATUS.LOADING })
 
     return measurementsApi
       .last(sensorId)
@@ -57,6 +59,7 @@ export default class LastTemperature extends Component {
 
   renderPlaceholder = () => (<SensorResultPlaceholder />)
   renderError = () => (<SensorResultError sensorId={this.state.sensorId} />)
+  renderLoader = () => (<Loader />)
 
   renderResult() {
     const { data, sensorId } = this.state
@@ -82,6 +85,8 @@ export default class LastTemperature extends Component {
     let content
     if (status === COMPONENT_STATUS.EMPTY) {
       content = this.renderPlaceholder()
+    } else if (status === COMPONENT_STATUS.LOADING) {
+      content = this.renderLoader()
     } else if (status === COMPONENT_STATUS.SUCCESS) {
       content = this.renderResult()
     } else if (status === COMPONENT_STATUS.ERROR) {
@@ -90,7 +95,6 @@ export default class LastTemperature extends Component {
 
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" hidden />
         <ScreenTitle text={LastTemperature.navigationOptions.drawerLabel} />
         <MeasurementFilter
           value={this.state.sensorId}
